@@ -46,7 +46,7 @@ import math
 
 st.set_page_config(
     page_title="Tea Auction Intelligence Dashboard", 
-    page_icon="🍃", 
+    page_icon="", 
     layout="wide"
 )
 
@@ -1257,24 +1257,24 @@ latest_sale = data["Sale_No"].max()
 latest_df = data[data["Sale_No"] == latest_sale]
 
 # --- Sidebar ---
-st.sidebar.title("🔍 Filters")
+st.sidebar.title(" Filters")
 selected_broker = st.sidebar.multiselect("Select Broker(s)", sorted(data["Broker"].unique()), default=sorted(data["Broker"].unique()))
 selected_category = st.sidebar.multiselect("Select Category", sorted(data["Category"].unique()), default=sorted(data["Category"].unique()))
 filtered = data[data["Broker"].isin(selected_broker) & data["Category"].isin(selected_category)]
 
 # --- Dashboard Tabs - Merged Overview and MPB Intelligence ---
 tabs = st.tabs([
-    "🏠 Market Overview & MPBL Metrics",
-    "🏢 Broker Performance",
-    "🏞️ Elevation & Category",
-    "🧾 Buyer Insights",
-    "🏷️ Selling Mark Analysis",
-    "💹 Price Trends"
+    "Market Overview & MPBL Metrics",
+    "Broker Performance",
+    "Elevation & Category",
+    "Buyer Insights",
+    "Selling Mark Analysis",
+    "Price Trends"
 ])
 
 # OVERVIEW & MPB INTELLIGENCE TAB
 with tabs[0]:
-    st.header(f"📊 Sale {latest_sale} - Market Overview & MPBL Metrics")
+    st.header(f"Sale {latest_sale} - Market Overview & MPBL Metrics")
     
     # Top Level Metrics with enhanced formatting
     total_val = latest_df["Total Value"].sum()
@@ -1352,7 +1352,7 @@ with tabs[0]:
         col4.metric("MPB Market Share", f"{(mpb_total_value/total_val*100):.1f}%")
     
     # MPB Trend Analysis
-    st.subheader("📈 MPBL Performance")
+    st.subheader(" MPBL Performance")
     
     col1, col2 = st.columns(2)
     
@@ -1370,7 +1370,7 @@ with tabs[0]:
         st.plotly_chart(fig2, use_container_width=True)
     
     # MPB Grade Performance
-    st.subheader("📊 MPBL Grade Performance")
+    st.subheader(" MPBL Grade Performance")
     if not mpb_latest.empty:
         mpb_grade_perf = mpb_latest.groupby("Grade").agg({
             "Total Weight": "sum",
@@ -1400,7 +1400,7 @@ with tabs[0]:
     st.markdown("---")
     
     # Elevation-wise Performance Summary
-    st.subheader("🏔️ Elevation-wise Performance Summary")
+    st.subheader(" Elevation-wise Performance Summary")
     
     elev_summary = latest_df.groupby("Sub Elevation").apply(lambda x: pd.Series({
         'Catalogued': x["Total Weight"].sum(),
@@ -1450,10 +1450,10 @@ with tabs[0]:
 
 # BROKER PERFORMANCE
 with tabs[1]:
-    st.header("🏢 Comprehensive Broker Performance Analysis")
+    st.header("Broker Performance Analysis")
     
     # Broker-wise Grade Performance
-    st.subheader("📊 Grade-wise Sold/Unsold/Outsold Percentages by Broker")
+
     
     broker_grade_analysis = latest_df.groupby(["Broker", "Grade"]).apply(lambda x: pd.Series({
         'Catalogued': x["Total Weight"].sum(),
@@ -1508,7 +1508,7 @@ with tabs[1]:
             st.plotly_chart(fig2, use_container_width=True)
         
         # Detailed grade table with enhanced formatting
-        st.markdown(f"### 📋 Detailed Grade Performance - {selected_broker_view}")
+        st.markdown(f"###  Detailed Grade Performance - {selected_broker_view}")
         display_data = broker_data[['Grade', 'Catalogued', 'Sold', 'Unsold', 'Outsold', 
                                      'Sold %', 'Unsold %', 'Outsold %', 'Avg_Price', 'Lots']].copy()
         
@@ -1529,7 +1529,7 @@ with tabs[1]:
     st.markdown("---")
     
     # Broker comparison by category
-    st.subheader("📊 Broker Performance by Category")
+    st.subheader(" Broker Performance by Category")
     broker_perf = filtered.groupby(["Broker", "Category"], as_index=False).agg({
         "Total Weight": "sum",
         "Price": "mean",
@@ -1553,10 +1553,10 @@ with tabs[1]:
 
 # BROKER PERFORMANCE
 with tabs[2]:
-    st.header("🏢 Broker Performance Deep Analysis - Quantity Based")
+    st.header("Elevation & Category Performance")
     
     # Broker quantity performance summary
-    st.subheader("📊 Broker Quantity Performance Overview")
+
     
     # Calculate broker performance metrics
     broker_performance = latest_df.groupby("Broker").apply(lambda x: pd.Series({
@@ -1581,7 +1581,7 @@ with tabs[2]:
     broker_performance['Is_MPB'] = broker_performance['Broker'] == 'MPB'
     
     # Top metrics cards for all brokers
-    st.markdown("### 🎯 Key Quantity Metrics - All Brokers")
+    st.markdown("###  Key Quantity Metrics - All Brokers")
     
     col1, col2, col3, col4, col5 = st.columns(5)
     with col1:
@@ -1604,7 +1604,7 @@ with tabs[2]:
     st.markdown("---")
     
     # Broker Quantity Distribution Charts
-    st.subheader("📈 Broker Quantity Distribution")
+    st.subheader(" Broker Quantity Distribution")
     
     col1, col2 = st.columns(2)
     
@@ -1631,7 +1631,7 @@ with tabs[2]:
         st.plotly_chart(fig_sold_side, use_container_width=True)
     
     # Stacked quantity breakdown
-    st.subheader("🍩 Quantity Status Breakdown by Broker")
+    st.subheader(" Quantity Status Breakdown by Broker")
     
     col1, col2 = st.columns(2)
     
@@ -1688,7 +1688,7 @@ with tabs[2]:
     st.markdown("---")
     
     # Broker Performance Metrics Table
-    st.subheader("📋 Detailed Broker Quantity Performance")
+    st.subheader(" Detailed Broker Quantity Performance")
     
     # Create display table with formatted quantities
     display_table = broker_performance[[
@@ -1727,7 +1727,7 @@ with tabs[2]:
     st.markdown("---")
     
     # Grade-wise Broker Performance
-    st.subheader("📊 Grade-wise Quantity Performance by Broker")
+    st.subheader(" Grade-wise Quantity Performance by Broker")
     
     # Get top grades by total quantity
     top_grades = latest_df.groupby('Grade')['Total Weight'].sum().nlargest(10).index
@@ -1777,7 +1777,7 @@ with tabs[2]:
         st.plotly_chart(fig_heatmap_sold_side, use_container_width=True)
     
     # Broker performance in top grades
-    st.subheader("🎯 Broker Performance in Top 10 Grades")
+    st.subheader(" Broker Performance in Top 10 Grades")
     
     # Create a visualization for broker share in top grades
     top_grades_broker_share = grade_broker_performance.groupby(['Grade', 'Broker'])['Total_Quantity'].sum().unstack(fill_value=0)
@@ -1799,7 +1799,7 @@ with tabs[2]:
     st.markdown("---")
     
     # Elevation-wise Broker Performance
-    st.subheader("🏔️ Elevation-wise Quantity Performance by Broker")
+    st.subheader(" Elevation-wise Quantity Performance by Broker")
     
     elevation_broker_performance = latest_df.groupby(['Sub Elevation', 'Broker']).apply(lambda x: pd.Series({
         'Total_Quantity': x["Total Weight"].sum(),
@@ -1843,7 +1843,7 @@ with tabs[2]:
     
     # Broker Performance Efficiency
     st.markdown("---")
-    st.subheader("⚡ Broker Efficiency Analysis - Quantity Focus")
+    st.subheader(" Broker Efficiency Analysis - Quantity Focus")
     
     col1, col2 = st.columns(2)
     
@@ -1879,21 +1879,21 @@ with tabs[2]:
 
 # BUYER INSIGHTS
 with tabs[3]:
-    st.header("🧾 Comprehensive Buyer Intelligence & Profiles")
+    st.header("Buyer Insights & Profiles")
     
     # Add MPB filter for buyer insights
     col1, col2 = st.columns([3, 1])
     with col2:
-        buyer_mpb_only = st.checkbox("🔵 Show MPB Buyers Only", value=False, key="buyer_mpb_filter")
+        buyer_mpb_only = st.checkbox(" Show MPB Buyers Only", value=False, key="buyer_mpb_filter")
     
     # Filter data based on MPB selection
     buyer_analysis_df = latest_df[latest_df["Status_Clean"] == "sold"]
     if buyer_mpb_only:
         buyer_analysis_df = buyer_analysis_df[buyer_analysis_df["Broker"] == "MPB"]
-        st.info(f"🔵 Showing MPB buyers only - {len(buyer_analysis_df)} records")
+        st.info(f" Showing MPB buyers only - {len(buyer_analysis_df)} records")
     
     # Buyer grade-wise purchasing analysis
-    st.subheader("📊 Buyer Purchased Profiles (Grade-wise)")
+    st.subheader(" Buyer Purchased Profiles (Grade-wise)")
     
     buyer_grade_profile = buyer_analysis_df.groupby(["Buyer", "Grade"]).agg({
         "Total Weight": "sum",
@@ -1912,7 +1912,7 @@ with tabs[3]:
     buyer_data = buyer_grade_profile[buyer_grade_profile["Buyer"] == selected_buyer]
     
     if not buyer_data.empty:
-        st.markdown(f"### 👤 {selected_buyer} - Purchase Profile")
+        st.markdown(f"###  {selected_buyer} - Purchase Profile")
         
         # Buyer summary metrics
         col1, col2, col3, col4 = st.columns(4)
@@ -1955,7 +1955,7 @@ with tabs[3]:
         st.plotly_chart(fig3, use_container_width=True)
         
         # Detailed grade table with enhanced formatting
-        st.markdown(f"### 📋 Grade-wise Purchase Details - {selected_buyer}")
+        st.markdown(f"###  Grade-wise Purchase Details - {selected_buyer}")
         display_buyer = buyer_data.sort_values('Total_Value', ascending=False).copy()
         
         # Format the display data
@@ -1970,7 +1970,7 @@ with tabs[3]:
     st.markdown("---")
     
     # Top buyers comparison
-    st.subheader("📊 Top 20 Buyers Comparison")
+    st.subheader(" Top 20 Buyers Comparison")
     
     buyers = buyer_analysis_df.groupby("Buyer", as_index=False).agg({
         "Total Value": "sum",
@@ -2002,7 +2002,7 @@ with tabs[3]:
     st.markdown("---")
     
     # Buyer loyalty analysis
-    st.subheader("🏆 Buyer Loyalty & Historical Participation")
+    st.subheader(" Buyer Loyalty & Historical Participation")
     
     loyalty = data.groupby("Buyer").agg({
         "Sale_No": "nunique",
@@ -2032,19 +2032,19 @@ with tabs[3]:
 
 # SELLING MARK ANALYSIS
 with tabs[4]:
-    st.header("🏷️ Comprehensive Selling Mark Analysis")
+    st.header("Selling Mark Analysis")
 
     if "Selling Mark" not in data.columns:
-        st.warning("⚠️ 'Selling Mark' column not found in your dataset.")
+        st.warning(" 'Selling Mark' column not found in your dataset.")
     else:
         has_trade_mark = ("Trade Mark" in data.columns and 
                          data["Trade Mark"].notna().any() and 
                          len(data[data["Trade Mark"].notna()]) > 0)
         
         if has_trade_mark:
-            st.info(f"✅ Found {data['Trade Mark'].notna().sum()} rows with Trade Mark data")
+            st.info(f" Found {data['Trade Mark'].notna().sum()} rows with Trade Mark data")
         else:
-            st.info("ℹ️ No Trade Mark column found or it's empty - showing all Selling Marks")
+            st.info("ℹ No Trade Mark column found or it's empty - showing all Selling Marks")
         
         col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
         
@@ -2072,18 +2072,18 @@ with tabs[4]:
                 st.write(f"**Trade Mark Groups Found:** {len(trade_marks_display)}")
                 
                 if not trade_marks_display:
-                    st.warning("⚠️ No valid Trade Marks found. Showing all Selling Marks.")
+                    st.warning(" No valid Trade Marks found. Showing all Selling Marks.")
                     has_trade_mark = False
                     available_marks = sorted([str(m).strip() for m in data["Selling Mark"].unique() 
                                             if str(m).strip() and str(m) not in ['nan', 'NaN', 'None', '']])
                     if not available_marks:
-                        st.error("⚠️ No valid Selling Marks found in your dataset.")
+                        st.error(" No valid Selling Marks found in your dataset.")
                         st.stop()
-                    selected_mark = st.selectbox("🔎 Select Selling Mark", ["All Marks"] + available_marks, key="selling_mark_select")
+                    selected_mark = st.selectbox(" Select Selling Mark", ["All Marks"] + available_marks, key="selling_mark_select")
                     analysis_mode = "single" if selected_mark != "All Marks" else "all"
                 else:
                     selected_trade_mark_display = st.selectbox(
-                        "🏭 Select Trade Mark Group", 
+                        " Select Trade Mark Group", 
                         trade_marks_display, 
                         key="trade_mark_select"
                     )
@@ -2094,31 +2094,31 @@ with tabs[4]:
                                             if str(m).strip() and str(m) not in ['nan', 'NaN', 'None', '']])
                     
                     if len(selected_trade_marks) > 1:
-                        st.info(f"📋 **{len(selected_trade_marks)} Trade Marks Selected:** {', '.join(selected_trade_marks)}")
+                        st.info(f" **{len(selected_trade_marks)} Trade Marks Selected:** {', '.join(selected_trade_marks)}")
                     
                     if not available_marks:
-                        st.warning(f"⚠️ No Selling Marks found under Trade Mark '{selected_trade_mark_display}'")
+                        st.warning(f" No Selling Marks found under Trade Mark '{selected_trade_mark_display}'")
                         st.stop()
                     
                     # Add option to view all marks under this trade mark group
-                    mark_options = ["📊 All Marks (Combined View)"] + available_marks
+                    mark_options = [" All Marks (Combined View)"] + available_marks
                     selected_mark = st.selectbox(
-                        f"🔎 Select Selling Mark ({len(available_marks)} available)", 
+                        f" Select Selling Mark ({len(available_marks)} available)", 
                         mark_options, 
                         key="selling_mark_select"
                     )
                     
-                    analysis_mode = "combined" if selected_mark == "📊 All Marks (Combined View)" else "single"
+                    analysis_mode = "combined" if selected_mark == " All Marks (Combined View)" else "single"
             else:
                 available_marks = sorted([str(m).strip() for m in data["Selling Mark"].unique() 
                                         if str(m).strip() and str(m) not in ['nan', 'NaN', 'None', '']])
                 if not available_marks:
-                    st.error("⚠️ No valid Selling Marks found in your dataset.")
+                    st.error(" No valid Selling Marks found in your dataset.")
                     st.stop()
                 
-                st.write(f"**🔎 Selling Marks Found:** {len(available_marks)}")
+                st.write(f"** Selling Marks Found:** {len(available_marks)}")
                 selected_mark = st.selectbox(
-                    "🔎 Select Selling Mark", 
+                    " Select Selling Mark", 
                     available_marks, 
                     key="selling_mark_select"
                 )
@@ -2127,18 +2127,18 @@ with tabs[4]:
         with col2:
             all_sales = sorted(data["Sale_No"].unique())
             sale_range = st.select_slider(
-                "📅 Sale Range",
+                " Sale Range",
                 options=all_sales,
                 value=(min(all_sales), max(all_sales))
             )
         
         with col3:
-            show_mpb_only = st.checkbox("📊 MPB Only View", value=False, key="mpb_filter")
+            show_mpb_only = st.checkbox(" MPB Only View", value=False, key="mpb_filter")
         
         with col4:
-            st.markdown("### 📄 Export")
-            if st.button("📥 Download PDF", type="primary", help="Generate comprehensive PDF report"):
-                st.info("💡 PDF report generation is available below. CSV exports have been removed.")
+            st.markdown("###  Export")
+            if st.button(" Download PDF", type="primary", help="Generate comprehensive PDF report"):
+                st.info(" PDF report generation is available below. CSV exports have been removed.")
 
         # Filter data based on selection
         if has_trade_mark and 'selected_trade_marks' in locals():
@@ -2182,14 +2182,14 @@ with tabs[4]:
             mark_df = mark_df[mark_df["Broker"] == "MPB"]
 
         if mark_df.empty:
-            st.info("📭 No data available for the selected filters.")
+            st.info(" No data available for the selected filters.")
         else:
             if has_trade_mark and 'selected_trade_marks' in locals():
                 if analysis_mode == "combined":
                     st.markdown(f"""
                     <div style="background-color: #e3f2fd; padding: 15px; border-radius: 10px; border-left: 5px solid #2196F3;">
-                        <h4 style="margin: 0; color: #1976D2;">🏭 Trade Mark Group: <strong>{selected_trade_mark_display}</strong></h4>
-                        <p style="margin: 5px 0 0 0; color: #424242;">📊 Analyzing <strong>{len(selected_marks_list)} Selling Marks</strong> combined</p>
+                        <h4 style="margin: 0; color: #1976D2;"> Trade Mark Group: <strong>{selected_trade_mark_display}</strong></h4>
+                        <p style="margin: 5px 0 0 0; color: #424242;"> Analyzing <strong>{len(selected_marks_list)} Selling Marks</strong> combined</p>
                         <p style="margin: 5px 0 0 0; font-size: 0.9em; color: #666;">Marks: {', '.join(selected_marks_list[:10])}{' ...' if len(selected_marks_list) > 10 else ''}</p>
                     </div>
                     """, unsafe_allow_html=True)
@@ -2197,28 +2197,28 @@ with tabs[4]:
                     trade_marks_str = ", ".join(selected_trade_marks)
                     st.markdown(f"""
                     <div style="background-color: #e3f2fd; padding: 15px; border-radius: 10px; border-left: 5px solid #2196F3;">
-                        <h4 style="margin: 0; color: #1976D2;">🏭 Trade Mark(s): <strong>{trade_marks_str}</strong></h4>
-                        <p style="margin: 5px 0 0 0; color: #424242;">🏷️ Selling Mark: <strong>{selected_mark}</strong></p>
+                        <h4 style="margin: 0; color: #1976D2;"> Trade Mark(s): <strong>{trade_marks_str}</strong></h4>
+                        <p style="margin: 5px 0 0 0; color: #424242;"> Selling Mark: <strong>{selected_mark}</strong></p>
                     </div>
                     """, unsafe_allow_html=True)
                 else:
                     st.markdown(f"""
                     <div style="background-color: #e8f5e9; padding: 15px; border-radius: 10px; border-left: 5px solid #4CAF50;">
-                        <h4 style="margin: 0; color: #2E7D32;">🏷️ Selling Mark: <strong>{selected_mark}</strong></h4>
+                        <h4 style="margin: 0; color: #2E7D32;"> Selling Mark: <strong>{selected_mark}</strong></h4>
                         <p style="margin: 5px 0 0 0; color: #424242;">Trade Mark: {selected_trade_marks[0]}</p>
                     </div>
                     """, unsafe_allow_html=True)
             elif analysis_mode == "all":
                 st.markdown(f"""
                 <div style="background-color: #fff3e0; padding: 15px; border-radius: 10px; border-left: 5px solid #FF9800;">
-                    <h4 style="margin: 0; color: #E65100;">📊 Analyzing All Selling Marks</h4>
+                    <h4 style="margin: 0; color: #E65100;"> Analyzing All Selling Marks</h4>
                     <p style="margin: 5px 0 0 0; color: #424242;">Total: <strong>{len(selected_marks_list)} marks</strong></p>
                 </div>
                 """, unsafe_allow_html=True)
             else:
                 st.markdown(f"""
                 <div style="background-color: #fff3e0; padding: 15px; border-radius: 10px; border-left: 5px solid #FF9800;">
-                    <h4 style="margin: 0; color: #E65100;">🏷️ Selling Mark: <strong>{display_title}</strong></h4>
+                    <h4 style="margin: 0; color: #E65100;"> Selling Mark: <strong>{display_title}</strong></h4>
                 </div>
                 """, unsafe_allow_html=True)
             
@@ -2226,7 +2226,7 @@ with tabs[4]:
             
             # Show breakdown information if applicable
             if has_trade_mark and 'selected_trade_marks' in locals() and len(selected_trade_marks) > 1:
-                with st.expander(f"📊 Trade Mark Breakdown ({len(selected_trade_marks)} variants)"):
+                with st.expander(f" Trade Mark Breakdown ({len(selected_trade_marks)} variants)"):
                     breakdown_data = []
                     for tm in selected_trade_marks:
                         tm_data = mark_df[mark_df["Trade Mark"] == tm]
@@ -2258,7 +2258,7 @@ with tabs[4]:
                         )
             
             st.markdown("---")
-            st.subheader("⚡ Quick Performance Comparison - Last 3 Sales")
+            st.subheader(" Quick Performance Comparison - Last 3 Sales")
             
             recent_sales = sorted(mark_df["Sale_No"].unique())[-3:]
             comparison_data = []
@@ -2291,7 +2291,7 @@ with tabs[4]:
                              delta=f"{sale_data['Sold %'] - comparison_df['Sold %'].mean():.1f}%" if idx > 0 else None)
                     st.metric("Avg Price", f"LKR {sale_data['Avg Price']:,.0f}")
                     st.metric("Proceeds", f"LKR {sale_data['Total Proceeds']:,.0f}")
-                    st.info(f"🏢 Top: **{sale_data['Top Broker']}**")
+                    st.info(f" Top: **{sale_data['Top Broker']}**")
             
             col1, col2 = st.columns(2)
             with col1:
@@ -2309,7 +2309,7 @@ with tabs[4]:
                 st.plotly_chart(fig_sold, use_container_width=True)
             
             st.markdown("---")
-            st.subheader(f"📊 Current Sale Summary - {display_title}")
+            st.subheader(f" Current Sale Summary - {display_title}")
             
             current_sale_df = mark_df[mark_df["Sale_No"] == latest_sale]
             
@@ -2317,7 +2317,7 @@ with tabs[4]:
                 if "broker_filter" not in st.session_state:
                     st.session_state.broker_filter = sorted(current_sale_df["Broker"].unique())
                 
-                st.markdown("### 🏢 Broker Participation")
+                st.markdown("###  Broker Participation")
                 broker_summary = current_sale_df.groupby("Broker").agg({
                     "Total Weight": "sum",
                     "Price": "mean",
@@ -2362,32 +2362,32 @@ with tabs[4]:
                 sell_pct = calculate_sell_percentage(total_sold_side_qty, catalogued_qty)
                 unsold_pct = calculate_sell_percentage(unsold_qty, catalogued_qty)
                 
-                st.markdown("### 📊 Sale Metrics")
+                st.markdown("###  Sale Metrics")
                 col1, col2, col3, col4, col5 = st.columns(5)
                 
                 with col1:
-                    st.metric("📦 Catalogued Qty", f"{catalogued_qty:,.2f} kg")
-                    st.metric("✅ Sold Qty", f"{sold_qty:,.2f} kg")
+                    st.metric(" Catalogued Qty", f"{catalogued_qty:,.2f} kg")
+                    st.metric(" Sold Qty", f"{sold_qty:,.2f} kg")
                 
                 with col2:
-                    st.metric("💰 Average Price", f"LKR {avg_price:,.2f}")
-                    st.metric("📈 Sold %", f"{sell_pct:.2f}%")
+                    st.metric(" Average Price", f"LKR {avg_price:,.2f}")
+                    st.metric(" Sold %", f"{sell_pct:.2f}%")
                 
                 with col3:
-                    st.metric("💵 Total Proceeds", format_currency(total_proceeds))
-                    st.metric("❌ Unsold %", f"{unsold_pct:.2f}%")
+                    st.metric(" Total Proceeds", format_currency(total_proceeds))
+                    st.metric(" Unsold %", f"{unsold_pct:.2f}%")
                 
                 with col4:
-                    st.metric("🚫 Unsold Qty", f"{unsold_qty:,.2f} kg")
-                    st.metric("📤 Withdrawn Qty", f"{withdrawn_qty:,.2f} kg")
+                    st.metric(" Unsold Qty", f"{unsold_qty:,.2f} kg")
+                    st.metric(" Withdrawn Qty", f"{withdrawn_qty:,.2f} kg")
                 
                 with col5:
                     num_lots = len(current_sale_df)
                     num_sold = len(sold_df)
-                    st.metric("📋 Total Lots", num_lots)
-                    st.metric("✓ Lots Sold", num_sold)
+                    st.metric(" Total Lots", num_lots)
+                    st.metric(" Lots Sold", num_sold)
                 
-                st.markdown("### 📊 Sale Performance Breakdown")
+                st.markdown("###  Sale Performance Breakdown")
                 col1, col2 = st.columns(2)
                 
                 with col1:
@@ -2421,19 +2421,19 @@ with tabs[4]:
                     st.plotly_chart(fig_bar, use_container_width=True)
             
             st.markdown("---")
-            st.subheader("📋 Detailed Lot Information with Broker Details")
+            st.subheader(" Detailed Lot Information with Broker Details")
             
             if not current_sale_df.empty:
-                st.markdown("### 🎯 Quick Filters")
+                st.markdown("###  Quick Filters")
                 filter_col1, filter_col2, filter_col3 = st.columns([1, 1, 2])
                 
                 with filter_col1:
-                    if st.button("✅ Show All Brokers", use_container_width=True):
+                    if st.button(" Show All Brokers", use_container_width=True):
                         st.session_state.broker_filter = sorted(current_sale_df["Broker"].unique())
                         st.rerun()
                 
                 with filter_col2:
-                    if st.button("🔵 Show MPB Only", use_container_width=True):
+                    if st.button(" Show MPB Only", use_container_width=True):
                         st.session_state.broker_filter = ["MPB"]
                         st.rerun()
                 
@@ -2474,7 +2474,7 @@ with tabs[4]:
                 
                 lot_details = lot_details.sort_values(["Broker", "Lot No"])
                 
-                st.markdown("### 📊 Summary by Broker")
+                st.markdown("###  Summary by Broker")
                 summary_data = []
                 for broker in sorted(filtered_lots["Broker"].unique()):
                     broker_data = filtered_lots[filtered_lots["Broker"] == broker]
@@ -2494,8 +2494,8 @@ with tabs[4]:
                 summary_df = pd.DataFrame(summary_data)
                 st.dataframe(summary_df, use_container_width=True, hide_index=True)
                 
-                st.markdown("### 📋 Lot Details")
-                st.caption("💡 **Broker column shows which broker sold each lot**")
+                st.markdown("###  Lot Details")
+                st.caption(" **Broker column shows which broker sold each lot**")
                 
                 lot_details_display = lot_details.copy()
                 lot_details_display["Total Weight"] = lot_details_display["Total Weight"].apply(lambda x: f"{x:,.2f}")
@@ -2514,7 +2514,7 @@ with tabs[4]:
                 st.dataframe(lot_details_display, use_container_width=True, hide_index=True)
                 
                 if "Valuation price" in filtered_lots.columns and "Asking Price" in filtered_lots.columns:
-                    st.markdown("### 💰 Price Analysis")
+                    st.markdown("###  Price Analysis")
                     
                     sold_lots = filtered_lots[filtered_lots["Status_Clean"] == "sold"]
                     if not sold_lots.empty:
@@ -2556,11 +2556,11 @@ with tabs[4]:
                 # CSV export options removed - PDF export is available in the report section
             
             st.markdown("---")
-            st.subheader("📊 Grade-Wise Comparative Analysis")
+            st.subheader(" Grade-Wise Comparative Analysis")
             
             if analysis_mode in ["combined", "all"]:
                 # Multi-mark comparison like Excel report
-                st.info(f"📈 Comparing **{len(selected_marks_list)}** selling marks across grades")
+                st.info(f" Comparing **{len(selected_marks_list)}** selling marks across grades")
                 
                 # Add filters for comparative analysis
                 col1, col2, col3 = st.columns([2, 1, 1])
@@ -2568,14 +2568,14 @@ with tabs[4]:
                     # Multi-select for specific marks if needed
                     if len(selected_marks_list) > 5:
                         marks_for_analysis = st.multiselect(
-                            "🎯 Select specific marks to compare (or leave empty for all)",
+                            " Select specific marks to compare (or leave empty for all)",
                             options=selected_marks_list,
                             default=[],
                             key="marks_filter"
                         )
                         if marks_for_analysis:
                             selected_marks_list = marks_for_analysis
-                            st.success(f"✓ Analyzing {len(marks_for_analysis)} selected marks")
+                            st.success(f" Analyzing {len(marks_for_analysis)} selected marks")
                 
                 with col2:
                     min_qty_filter = st.number_input(
@@ -2652,7 +2652,7 @@ with tabs[4]:
                             st.metric("Avg Std Dev", f"LKR {grade_comp_df['Std Dev'].mean():,.0f}")
                         
                         # Pivot table for grade comparison (like Excel)
-                        st.markdown("### 📋 Grade Comparison Matrix (Excel-Style)")
+                        st.markdown("###  Grade Comparison Matrix (Excel-Style)")
                         
                         # Create pivot for QTY with error handling
                         try:
@@ -2694,7 +2694,7 @@ with tabs[4]:
                             st.error(f"Error creating pivot tables: {str(e)}")
                             st.stop()
                         
-                        tab1, tab2, tab3, tab4 = st.tabs(["📊 Quantity (kg)", "💰 Avg Price (LKR)", "📈 Percentage (%)", "💵 Total Value"])
+                        tab1, tab2, tab3, tab4 = st.tabs([" Quantity (kg)", " Avg Price (LKR)", " Percentage (%)", " Total Value"])
                         
                         with tab1:
                             # Add totals row and column
@@ -2832,7 +2832,7 @@ with tabs[4]:
                                 st.info("No data available for treemap visualization")
                         
                         # Top performing grades
-                        st.markdown("### 🏆 Top Performing Grades Analysis")
+                        st.markdown("###  Top Performing Grades Analysis")
                         
                         col1, col2, col3 = st.columns(3)
                         
@@ -2876,7 +2876,7 @@ with tabs[4]:
                             st.plotly_chart(fig_top_value, use_container_width=True)
                         
                         # Price vs Quantity scatter
-                        st.markdown("### 💹 Price vs Quantity Analysis")
+                        st.markdown("###  Price vs Quantity Analysis")
                         fig_scatter = px.scatter(
                             grade_comp_df,
                             x="QTY (kg)",
@@ -2891,7 +2891,7 @@ with tabs[4]:
                         st.plotly_chart(fig_scatter, use_container_width=True)
                         
                         # Selling Mark performance summary
-                        st.markdown("### 📊 Selling Mark Performance Summary")
+                        st.markdown("###  Selling Mark Performance Summary")
                         mark_summary = grade_comp_df.groupby("Selling Mark").agg({
                             "QTY (kg)": "sum",
                             "AVG Price": "mean",
@@ -2955,7 +2955,7 @@ with tabs[4]:
                             st.plotly_chart(fig_mark_price, use_container_width=True)
                         
                         # Grade diversity analysis
-                        st.markdown("### 🌈 Grade Diversity Analysis")
+                        st.markdown("###  Grade Diversity Analysis")
                         col1, col2 = st.columns(2)
                         
                         with col1:
@@ -2986,13 +2986,13 @@ with tabs[4]:
                         
                         # CSV export options removed - PDF export is available in the report section
                 else:
-                    st.warning("📭 No grade comparison data available for the selected filters. Try adjusting:")
+                    st.warning(" No grade comparison data available for the selected filters. Try adjusting:")
                     st.info("• Decrease minimum quantity filter\n• Select more selling marks\n• Expand the sale range")
             else:
-                st.info("ℹ️ Grade-wise comparative analysis is available when viewing multiple selling marks together. Select 'All Marks (Combined View)' to see detailed comparisons.")
+                st.info("ℹ Grade-wise comparative analysis is available when viewing multiple selling marks together. Select 'All Marks (Combined View)' to see detailed comparisons.")
             
             st.markdown("---")
-            st.subheader("📈 Historical Performance Analysis")
+            st.subheader(" Historical Performance Analysis")
             
             historical = mark_df.groupby("Sale_No").apply(lambda x: pd.Series({
                 'Catalogued': x["Total Weight"].sum(),
@@ -3064,7 +3064,7 @@ with tabs[4]:
             st.plotly_chart(fig_sell_pct, use_container_width=True)
             
             st.markdown("---")
-            st.subheader("👥 Buyer Analysis with Broker Breakdown")
+            st.subheader(" Buyer Analysis with Broker Breakdown")
             
             buyer_analysis = mark_df[mark_df["Status_Clean"] == "sold"].groupby(["Buyer", "Broker"]).agg({
                 "Total Weight": "sum",
@@ -3106,7 +3106,7 @@ with tabs[4]:
                 st.plotly_chart(fig_buyer_broker, use_container_width=True)
             
             if "MPB" in buyer_analysis["Broker"].values:
-                st.markdown("### 🔍 MPB Performance vs Other Brokers")
+                st.markdown("###  MPB Performance vs Other Brokers")
                 
                 mpb_buyers = buyer_analysis[buyer_analysis["Broker"] == "MPB"].groupby("Buyer")["Total_Value"].sum().reset_index()
                 other_buyers = buyer_analysis[buyer_analysis["Broker"] != "MPB"].groupby("Buyer")["Total_Value"].sum().reset_index()
@@ -3121,7 +3121,7 @@ with tabs[4]:
                     st.metric("Other Brokers Total Value", format_currency(other_buyers["Total_Value"].sum()))
             
             st.markdown("---")
-            st.subheader("🏆 Grade Performance Analysis")
+            st.subheader(" Grade Performance Analysis")
             
             grade_analysis = mark_df[mark_df["Status_Clean"] == "sold"].groupby("Grade").agg({
                 "Total Weight": "sum",
@@ -3160,7 +3160,7 @@ with tabs[4]:
                 st.plotly_chart(fig_grade_price, use_container_width=True)
             
             st.markdown("---")
-            st.subheader("📅 Month-to-Date Performance")
+            st.subheader(" Month-to-Date Performance")
             
             mtd_catalogued = historical['Catalogued'].sum()
             mtd_sold = historical['Sold'].sum()
@@ -3173,22 +3173,22 @@ with tabs[4]:
             col1, col2, col3, col4 = st.columns(4)
             
             with col1:
-                st.metric("📦 MTD Catalogued", f"{mtd_catalogued:,.2f} kg")
-                st.metric("✅ MTD Sold", f"{mtd_sold:,.2f} kg")
+                st.metric(" MTD Catalogued", f"{mtd_catalogued:,.2f} kg")
+                st.metric(" MTD Sold", f"{mtd_sold:,.2f} kg")
             
             with col2:
-                st.metric("💰 MTD Avg Price", f"LKR {mtd_avg_price:,.2f}")
-                st.metric("📈 MTD Sold %", f"{mtd_sell_pct:.2f}%")
+                st.metric(" MTD Avg Price", f"LKR {mtd_avg_price:,.2f}")
+                st.metric(" MTD Sold %", f"{mtd_sell_pct:.2f}%")
             
             with col3:
-                st.metric("💵 MTD Proceeds", format_currency(mtd_proceeds))
-                st.metric("❌ MTD Unsold %", f"{mtd_unsold_pct:.2f}%")
+                st.metric(" MTD Proceeds", format_currency(mtd_proceeds))
+                st.metric(" MTD Unsold %", f"{mtd_unsold_pct:.2f}%")
             
             with col4:
-                st.metric("🚫 MTD Unsold", f"{mtd_unsold:,.2f} kg")
-                st.metric("📊 Total Sales", len(historical))
+                st.metric(" MTD Unsold", f"{mtd_unsold:,.2f} kg")
+                st.metric(" Total Sales", len(historical))
             
-            st.markdown("### 📋 Sale-by-Sale Comparison")
+            st.markdown("###  Sale-by-Sale Comparison")
             historical_display = historical.copy()
             historical_display['Avg_Price'] = historical_display['Avg_Price'].apply(lambda x: f"{x:,.2f}")
             historical_display['Total_Proceeds'] = historical_display['Total_Proceeds'].apply(lambda x: f"{x:,.0f}")
@@ -3201,10 +3201,10 @@ with tabs[4]:
 
 # PRICE TRENDS
 with tabs[5]:
-    st.header("💹 Comprehensive Price Analysis & Trends")
+    st.header("Price Trends Analysis")
     
     # Top level price metrics
-    st.subheader("💰 Key Price Metrics")
+    st.subheader("Key Price Metrics")
     
     col1, col2, col3, col4 = st.columns(4)
     with col1:
@@ -3223,7 +3223,7 @@ with tabs[5]:
     st.markdown("---")
     
     # Main scatter plot
-    st.subheader("📊 Price vs Weight Distribution")
+    st.subheader(" Price vs Weight Distribution")
     
     col1, col2 = st.columns([3, 1])
     with col2:
@@ -3251,7 +3251,7 @@ with tabs[5]:
     st.markdown("---")
     
     # Top Prices Analysis by Broker
-    st.subheader("🏆 Top 10 Highest Prices by Broker")
+    st.subheader(" Top 10 Highest Prices by Broker")
     
     # Get top 10 prices for each broker
     top_prices_by_broker = []
@@ -3281,7 +3281,7 @@ with tabs[5]:
         col1, col2 = st.columns(2)
         
         with col1:
-            st.markdown("### 📋 Top Prices Details")
+            st.markdown("###  Top Prices Details")
             display_top_prices = top_prices_df[[
                 'Broker', 'Price', 'Total Weight', 'Grade', 'Selling Mark'
             ]].copy()
@@ -3301,7 +3301,7 @@ with tabs[5]:
             st.plotly_chart(fig_top_prices, use_container_width=True)
         
         # Selling Marks analysis for top prices
-        st.markdown("### 🏷️ Selling Marks in Top Prices")
+        st.markdown("###  Selling Marks in Top Prices")
         
         # Count selling marks in top prices
         selling_mark_top_counts = top_prices_df[top_prices_df['Selling Mark'] != 'N/A'].groupby('Selling Mark').agg({
@@ -3341,7 +3341,7 @@ with tabs[5]:
     st.markdown("---")
     
     # Price Distribution Analysis
-    st.subheader("📈 Price Distribution Analysis")
+    st.subheader(" Price Distribution Analysis")
     
     col1, col2 = st.columns(2)
     
@@ -3365,7 +3365,7 @@ with tabs[5]:
     st.markdown("---")
     
     # Grade-wise Price Analysis
-    st.subheader("📊 Grade-wise Price Performance")
+    st.subheader(" Grade-wise Price Performance")
     
     # Get top grades by average price
     grade_price_analysis = sold_df.groupby('Grade').agg({
@@ -3406,7 +3406,7 @@ with tabs[5]:
     st.markdown("---")
     
     # Broker Price Performance Comparison
-    st.subheader("🏢 Broker Price Performance Comparison")
+    st.subheader(" Broker Price Performance Comparison")
     
     broker_price_stats = sold_df.groupby('Broker').agg({
         'Price': ['mean', 'median', 'std', 'min', 'max', 'count'],
@@ -3442,7 +3442,7 @@ with tabs[5]:
         st.plotly_chart(fig_broker_range, use_container_width=True)
     
     # Detailed broker price statistics table
-    st.markdown("### 📋 Detailed Broker Price Statistics")
+    st.markdown("###  Detailed Broker Price Statistics")
     
     broker_display_stats = broker_price_stats.reset_index()
     broker_display_stats['Avg_Price'] = broker_display_stats['Avg_Price'].apply(lambda x: f"LKR {x:,.2f}")
@@ -3461,7 +3461,7 @@ with tabs[5]:
     
     # Price Trends Over Time (if multiple sales data available)
     if len(data['Sale_No'].unique()) > 1:
-        st.subheader("📅 Price Trends Across Sales")
+        st.subheader(" Price Trends Across Sales")
         
         price_trends = data[data["Status_Clean"] == "sold"].groupby(['Sale_No', 'Broker']).agg({
             'Price': 'mean',
@@ -3485,7 +3485,7 @@ with tabs[5]:
     
     # Price vs Quantity Correlation Analysis
     st.markdown("---")
-    st.subheader("🔍 Price-Quantity Correlation Analysis")
+    st.subheader(" Price-Quantity Correlation Analysis")
     
     correlation_df = sold_df[['Price', 'Total Weight', 'Total Value']].corr()
     
@@ -3512,28 +3512,28 @@ with tabs[5]:
 
 
 st.markdown("---")
-st.header("📄 Professional PDF Report Generation")
+st.header(" Professional PDF Report Generation")
 st.markdown("Generate elevation-wise PDF reports with **selective report options** - **3-15 seconds** based on selection")
 
 # Quick info section
-with st.expander("ℹ️ What's Included in Reports"):
+with st.expander("ℹ What's Included in Reports"):
     st.markdown("""
-    **📊 5 Required Reports (Sub Elevation Wise):**
+    ** 5 Required Reports (Sub Elevation Wise):**
     
-    ✅ **Report 1: Broker Grade-wise Sold Percentages** - Each broker's grade wise sold percentages by Sub Elevation  
-    ✅ **Report 2: Broker Grade-wise Unsold Percentages** - Each broker's grade wise unsold percentages by Sub Elevation  
-    ✅ **Report 3: Broker Grade-wise Outsold Percentages** - Each broker's grade wise outsold percentages by Sub Elevation  
-    ✅ **Report 4: Broker Grade-wise Sold Quantities & Avg Prices** - Sold quantities and average prices by Sub Elevation  
-    ✅ **Report 5: Outlots Purchased Buyer Profiles** - Buyer profiles grade wise by Sub Elevation  
+     **Report 1: Broker Grade-wise Sold Percentages** - Each broker's grade wise sold percentages by Sub Elevation  
+     **Report 2: Broker Grade-wise Unsold Percentages** - Each broker's grade wise unsold percentages by Sub Elevation  
+     **Report 3: Broker Grade-wise Outsold Percentages** - Each broker's grade wise outsold percentages by Sub Elevation  
+     **Report 4: Broker Grade-wise Sold Quantities & Avg Prices** - Sold quantities and average prices by Sub Elevation  
+     **Report 5: Outlots Purchased Buyer Profiles** - Buyer profiles grade wise by Sub Elevation  
     
-    **⚡ Optimized Performance:**
+    ** Optimized Performance:**
     - **Tables only** - Fast generation without charts (default)
     - **Optional Charts** - Add summary charts/graphs if needed (slower but visual)
     - **Selective generation** - Choose only reports you need
     - Current sale only: **3-5 seconds** (1 report) to **10-15 seconds** (all 5 reports)
     - With charts: **+5-8 seconds** additional time
     
-    **📝 Report Structure (SUMMARIZED):**
+    ** Report Structure (SUMMARIZED):**
     - All reports organized by **Sub Elevation** (L, M, UH, UM, WH, WM)
     - Each broker shown separately with **summary table + bar chart** by elevation
     - **Top 10 grades only** per elevation (not all grades - reduces pages significantly)
@@ -3542,26 +3542,26 @@ with st.expander("ℹ️ What's Included in Reports"):
     - Professional A4 format with page numbers
     - **Estimated 15-25 pages** (much shorter than before)
     
-    **📊 Summary Charts (Optional):**
+    ** Summary Charts (Optional):**
     - Market Share by Broker (Pie Chart)
     - Overall Sale Status Distribution (Pie Chart)
     - Broker Performance - Sold Percentage (Bar Chart)
     - Elevation Performance - Status Percentages (Stacked Bar Chart)
     
-    **📈 Bar Charts in Reports:**
+    ** Bar Charts in Reports:**
     - Each report includes bar charts showing percentages by Sub Elevation
     - Mini bar charts for top grades within each elevation
     - Visual representation for easy reference
     """)
 
 # Report configuration
-st.subheader("🎯 Quick Report Generation")
+st.subheader(" Quick Report Generation")
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
     report_scope = st.selectbox(
-        "📅 Data Scope",
+        " Data Scope",
         ["Current Sale Only", "Last 3 Sales", "Last 5 Sales", "All Available Sales"],
         index=0,
         help="Current sale is fastest (5-8 seconds)"
@@ -3569,25 +3569,25 @@ with col1:
 
 with col2:
     report_format = st.selectbox(
-        "📋 Report Format",
+        " Report Format",
         ["Standard (Fast)", "Detailed (More Data)"],
         index=0,
         help="Standard format is optimized for speed"
     )
 
 with col3:
-    st.markdown("##### 📊 Report Selection")
+    st.markdown("#####  Report Selection")
     st.info("Select which reports to include in PDF")
 
 # Quick templates
 st.markdown("---")
-st.subheader("🚀 Quick Generation Templates")
+st.subheader(" Quick Generation Templates")
 
 template_col1, template_col2, template_col3 = st.columns(3)
 
 with template_col1:
     quick_report_btn = st.button(
-        "⚡ Quick Report - Current Sale",
+        " Quick Report - Current Sale",
         use_container_width=True,
         type="primary",
         help="Generate report for current sale only (5-8 seconds)"
@@ -3595,21 +3595,21 @@ with template_col1:
 
 with template_col2:
     weekly_report_btn = st.button(
-        "📅 Weekly Report - Last 3 Sales",
+        " Weekly Report - Last 3 Sales",
         use_container_width=True,
         help="Generate report for last 3 sales (10-12 seconds)"
     )
 
 with template_col3:
     full_report_btn = st.button(
-        "📊 Full Report - All Sales",
+        " Full Report - All Sales",
         use_container_width=True,
         help="Generate comprehensive report (15-20 seconds)"
     )
 
 # Report Selection Checkboxes
 st.markdown("---")
-st.subheader("📋 Select Reports to Include")
+st.subheader(" Select Reports to Include")
 
 col1, col2, col3 = st.columns(3)
 
@@ -3629,10 +3629,10 @@ with col3:
     report5 = st.checkbox("Report 5: Outlots Purchased Buyer Profiles (Grade wise, Sub Elevation)", value=True,
                          help="Outlots purchased buyer profiles, grade wise by Sub Elevation")
     st.markdown("---")
-    st.markdown("**📊 Summary Reports (Optional):**")
-    summary_market = st.checkbox("📈 Overall Market Performance Summary", value=False,
+    st.markdown("** Summary Reports (Optional):**")
+    summary_market = st.checkbox(" Overall Market Performance Summary", value=False,
                                 help="Overall market statistics with MPB highlighting")
-    summary_broker_perf = st.checkbox("📊 Broker Performance Comparison", value=False,
+    summary_broker_perf = st.checkbox(" Broker Performance Comparison", value=False,
                                       help="Detailed broker performance by Sub Elevation with MPB highlighting")
 
 # Main generate button
@@ -3641,7 +3641,7 @@ generate_col1, generate_col2, generate_col3 = st.columns([1, 2, 1])
 
 with generate_col2:
     generate_button = st.button(
-        "🖨️ GENERATE PROFESSIONAL PDF REPORT",
+        " GENERATE PROFESSIONAL PDF REPORT",
         type="primary",
         use_container_width=True,
         help="Generate PDF with selected reports only (faster generation)"
@@ -3656,7 +3656,7 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
             from reportlab.lib.pagesizes import A4
         except ImportError:
             st.error("""
-            ❌ **ReportLab library not found!**
+             **ReportLab library not found!**
             
             Please install it using:
             ```bash
@@ -3676,7 +3676,7 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
             report_scope = "All Available Sales"
         
         # Generate report with progress tracking
-        with st.spinner(f"🔄 Generating {report_scope} report..."):
+        with st.spinner(f" Generating {report_scope} report..."):
             import time
             
             # Progress indicators
@@ -3692,10 +3692,10 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
             else:
                 estimated_time = "25-30 seconds"
             
-            time_estimate.info(f"⏱️ Estimated completion time: {estimated_time}")
+            time_estimate.info(f" Estimated completion time: {estimated_time}")
             
             # Step 1: Filter data
-            status_text.text("📊 Processing sale data...")
+            status_text.text(" Processing sale data...")
             progress_bar.progress(15)
             time.sleep(0.2)
             
@@ -3711,17 +3711,17 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
                 report_data = data
             
             # Step 2: Calculate metrics
-            status_text.text("🔢 Calculating performance metrics...")
+            status_text.text(" Calculating performance metrics...")
             progress_bar.progress(30)
             time.sleep(0.2)
             
             # Step 3: Generate broker analysis
-            status_text.text("🢠Analyzing all 8 brokers...")
+            status_text.text("Analyzing all 8 brokers...")
             progress_bar.progress(50)
             time.sleep(0.3)
             
             # Step 4: Generate PDF
-            status_text.text("📝 Creating PDF document...")
+            status_text.text(" Creating PDF document...")
             progress_bar.progress(70)
             
             # Import the optimized function
@@ -3748,7 +3748,7 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
             # Check if at least one report is selected (excluding charts)
             report_selections = [report1, report2, report3, report4, report5]
             if not any(report_selections):
-                st.warning("⚠️ Please select at least one report to generate!")
+                st.warning(" Please select at least one report to generate!")
                 st.stop()
             
             # Call the optimized PDF generator
@@ -3760,12 +3760,12 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
             )
             
             # Step 5: Finalize
-            status_text.text("✅ Finalizing document...")
+            status_text.text(" Finalizing document...")
             progress_bar.progress(95)
             time.sleep(0.2)
             
             progress_bar.progress(100)
-            status_text.text("✅ Report generation complete!")
+            status_text.text(" Report generation complete!")
             time.sleep(0.3)
             
             # Clear progress indicators
@@ -3775,17 +3775,17 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
             
             # Success message
             st.success(f"""
-            ✅ **PDF Report Generated Successfully!**
+             **PDF Report Generated Successfully!**
             
-            📊 Scope: {report_scope}  
-            📄 Pages: Approximately 12-15 pages  
-            💾 Size: {len(pdf_data) / 1024:.1f} KB  
-            🕒 Generated: {datetime.now().strftime('%H:%M:%S')}
+             Scope: {report_scope}  
+             Pages: Approximately 12-15 pages  
+             Size: {len(pdf_data) / 1024:.1f} KB  
+             Generated: {datetime.now().strftime('%H:%M:%S')}
             """)
             
             # Download section
             st.markdown("---")
-            st.subheader("📥 Download Your Report")
+            st.subheader(" Download Your Report")
             
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
             filename = f"Tea_Auction_Report_Sale_{latest_sale}_{timestamp}.pdf"
@@ -3794,7 +3794,7 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
             
             with col2:
                 st.download_button(
-                    label="📥 DOWNLOAD COMPLETE PDF REPORT",
+                    label=" DOWNLOAD COMPLETE PDF REPORT",
                     data=pdf_data,
                     file_name=filename,
                     mime="application/pdf",
@@ -3804,13 +3804,13 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
             
             # Report summary
             st.markdown("---")
-            st.subheader("📋 Report Contents Summary")
+            st.subheader(" Report Contents Summary")
             
             summary_col1, summary_col2, summary_col3 = st.columns(3)
             
             with summary_col1:
                 st.markdown("""
-                **📊 Market Overview**
+                ** Market Overview**
                 - Executive summary
                 - Market metrics
                 - Key performance indicators
@@ -3819,7 +3819,7 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
             
             with summary_col2:
                 st.markdown("""
-                **🢠All 8 Brokers**
+                **All 8 Brokers**
                 - Performance by elevation
                 - Grade breakdown per elevation
                 - Sold/Unsold/Outsold % per elevation
@@ -3828,7 +3828,7 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
             
             with summary_col3:
                 st.markdown("""
-                **👥 Buyer Analysis**
+                ** Buyer Analysis**
                 - Top 5 buyers
                 - Elevation preferences
                 - Grade patterns by elevation
@@ -3836,7 +3836,7 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
                 """)
             
             # Additional details
-            with st.expander("📄 Detailed Report Breakdown"):
+            with st.expander(" Detailed Report Breakdown"):
                 st.markdown(f"""
                 **Report Details:**
                 
@@ -3904,7 +3904,7 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
             
     except Exception as e:
         st.error(f"""
-        ❌ **Error generating PDF report:**
+         **Error generating PDF report:**
         
         {str(e)}
         
@@ -3916,14 +3916,14 @@ if generate_button or quick_report_btn or weekly_report_btn or full_report_btn:
         """)
         
         # Show detailed error for debugging
-        with st.expander("🔍 Technical Error Details"):
+        with st.expander(" Technical Error Details"):
             import traceback
             st.code(traceback.format_exc())
 
 # Report history section
 if 'report_history' in st.session_state and st.session_state.report_history:
     st.markdown("---")
-    st.subheader("📚 Recent Report Generation History")
+    st.subheader(" Recent Report Generation History")
     
     # Show last 5 reports
     history_data = []
@@ -3942,20 +3942,20 @@ if 'report_history' in st.session_state and st.session_state.report_history:
     
     st.dataframe(history_df, use_container_width=True, hide_index=True)
     
-    if st.button("🗑️ Clear History"):
+    if st.button(" Clear History"):
         st.session_state.report_history = []
         st.rerun()
 
 # Tips and best practices
 st.markdown("---")
-with st.expander("💡 PDF Generation Tips & Best Practices"):
+with st.expander(" PDF Generation Tips & Best Practices"):
     st.markdown("""
-    **⚡ For Fastest Generation:**
+    ** For Fastest Generation:**
     - Use "Current Sale Only" (8-12 seconds)
     - Standard format is optimized for speed
     - All 8 brokers with elevation breakdown included
     
-    **📊 Understanding Elevation-Based Reports:**
+    ** Understanding Elevation-Based Reports:**
     - Each broker's data is organized by elevation first
     - Within each elevation, top 8 grades are shown
     - **Sold %**: Percentage of catalogued quantity sold per elevation
@@ -3963,26 +3963,26 @@ with st.expander("💡 PDF Generation Tips & Best Practices"):
     - **Outsold %**: Percentage that went to competing brokers per elevation
     - Buyers show their purchasing patterns by elevation
     
-    **🎯 Best Use Cases:**
+    ** Best Use Cases:**
     - **Daily Operations**: Current Sale Only (elevation focus)
     - **Weekly Reviews**: Last 3 Sales (elevation trends)
     - **Monthly Analysis**: Last 5 Sales (elevation performance)
     - **Comprehensive Audit**: All Sales (complete elevation history)
     
-    **📄 Report Format:**
+    ** Report Format:**
     - Professional A4 size (portrait)
     - 15-20 pages typical (with elevation breakdown)
     - Clean tables organized by elevation
     - Page numbers on every page
     - Automatic timestamp
     
-    **💾 File Management:**
+    ** File Management:**
     - Reports are generated fresh each time
     - Download and save important reports
     - Filename includes sale number and timestamp
     - Average file size: 75-200 KB (more data with elevations)
     
-    **🔧 Technical Notes:**
+    ** Technical Notes:**
     - Requires `reportlab` library
     - Elevation-grade calculations optimized
     - All 8 brokers processed in single pass
@@ -3993,22 +3993,22 @@ with st.expander("💡 PDF Generation Tips & Best Practices"):
 # Performance information
 st.markdown("---")
 st.info("""
-**⚡ Performance Optimized - Elevation-Based Analysis:**  
+** Performance Optimized - Elevation-Based Analysis:**  
 This PDF generator provides comprehensive elevation-wise breakdown:
-- ✅ All 8 brokers with elevation analysis
-- ✅ Each elevation shows grade performance
-- ✅ Sold/Unsold/Outsold % per elevation
-- ✅ Buyer preferences by elevation
-- ✅ Pre-calculated metrics for speed
-- ✅ Progress tracking with time estimates
-- ✅ 15-20 pages of detailed insights
+-  All 8 brokers with elevation analysis
+-  Each elevation shows grade performance
+-  Sold/Unsold/Outsold % per elevation
+-  Buyer preferences by elevation
+-  Pre-calculated metrics for speed
+-  Progress tracking with time estimates
+-  15-20 pages of detailed insights
 """)
 
 # Footer
 st.markdown("---")
-st.caption("📄 Professional PDF Reports | Optimized for Tea Auction Business Intelligence")
+st.caption(" Professional PDF Reports | Optimized for Tea Auction Business Intelligence")
 
 # Remove the problematic pie chart at the end that was causing the error
-st.success("✅ Dashboard Loaded Successfully with OKLO MAIN AUCTION DATA")
+st.success(" Dashboard Loaded Successfully with OKLO MAIN AUCTION DATA")
 
 
