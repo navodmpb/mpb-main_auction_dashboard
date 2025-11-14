@@ -1,0 +1,8 @@
+[General]
+python = "3.11"
+
+[Packages]
+pandas = ">=2.0.0"
+streamlit = ">=1.40.0"
+plotly = ">=5.17.0"
+reportlab = ">=4.0.9"
