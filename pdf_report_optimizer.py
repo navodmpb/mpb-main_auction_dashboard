@@ -319,7 +319,7 @@ class ElevationWiseReportOptimizer:
         # Title Page
         story.append(Spacer(1, 0.5*inch))
         story.append(Paragraph("Mercantile Produce Brokers Pvt Ltd", self.heading2_style))
-        story.append(Paragraph("TEA AUCTION INTELLIGENCE REPORT", self.title_style))
+        story.append(Paragraph("MAIN AUCTION DETAILED REPORT", self.title_style))
         story.append(Spacer(1, 0.3*inch))
         story.append(Paragraph("Elevation-Wise Performance Analysis (All Grades Included)", self.body_style))
         story.append(Spacer(1, 0.2*inch))
