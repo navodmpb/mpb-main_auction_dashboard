@@ -934,8 +934,7 @@ def generate_broker_performance_summary(latest_df, story, heading1_style, headin
             spaceAfter=6,
             spaceBefore=10
         )
-        mpb_label = " (MPB - Market Performance Leader)" if is_mpb else ""
-        story.append(Paragraph(f"BROKER: {broker}{mpb_label}", broker_header_style))
+        story.append(Paragraph(f"BROKER: {broker}", broker_header_style))
         
         broker_data = broker_elev_perf[broker_elev_perf["Broker"] == broker].sort_values('Sub Elevation')
         
