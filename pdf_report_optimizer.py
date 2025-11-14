@@ -6,6 +6,8 @@
 import pandas as pd
 import numpy as np
 import io
+import plotly.express as px
+import plotly.io as pio
 from datetime import datetime
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
@@ -213,6 +215,15 @@ class ElevationWiseReportOptimizer:
                     
                     story.append(KeepTogether([table]))
                     story.append(Spacer(1, 0.05*inch))
+                    # Mini bar chart for top grades within this elevation (top 5)
+                    try:
+                        top_n = top_grades.head(5)
+                        if not top_n.empty:
+                            mini_fig = px.bar(top_n, x='Grade', y='Sold_%', title=f'Top Grades Sold% - {elevation}', labels={'Sold_%':'Sold %'})
+                            mini_fig.update_layout(showlegend=False, yaxis_ticksuffix='%', height=300)
+                            self.add_plotly_figure_to_story(mini_fig, story, img_width=420, img_height=240)
+                    except Exception:
+                        pass
             
             # Page break after each broker (except last)
             if broker_idx < len(all_brokers) - 1:
@@ -292,6 +303,86 @@ class ElevationWiseReportOptimizer:
                 story.append(PageBreak())
         
         return story
+
+    def add_plotly_figure_to_story(self, fig, story, img_width=540, img_height=320):
+        """Render a Plotly figure to PNG (via kaleido) and add to the ReportLab story.
+
+        img_width/img_height are pixel sizes passed to kaleido; the Image will be scaled
+        to a sensible size in the PDF (we use inches conversion when setting size).
+        """
+        try:
+            img_bytes = pio.to_image(fig, format='png', width=int(img_width), height=int(img_height), scale=2)
+            img_buf = io.BytesIO(img_bytes)
+            img = Image(img_buf)
+            # Set draw width relative to page (approx 6 inches)
+            img.drawWidth = 6 * inch
+            # preserve aspect ratio
+            img.drawHeight = (6 * inch) * (img_height / img_width)
+            story.append(img)
+            story.append(Spacer(1, 0.15*inch))
+        except Exception as e:
+            # If chart export fails, include a placeholder text
+            story.append(Paragraph(f"[Chart could not be rendered: {str(e)}]", self.body_style))
+            story.append(Spacer(1, 0.15*inch))
+
+    def generate_summary_charts(self, story):
+        """Generate and embed summary charts at the start of the PDF.
+
+        Adds:
+          - Market Share by Broker (pie)
+          - Overall Sale Status Distribution (pie)
+          - Broker Performance - Sold Percentage (bar)
+          - Elevation Performance - Status Percentages (stacked bar)
+        """
+        df = self.latest_df.copy()
+
+        # Market Share by Broker (Value)
+        try:
+            market_share = df.groupby('Broker', dropna=False)['Total Value'].sum().reset_index()
+            fig1 = px.pie(market_share, names='Broker', values='Total Value', title='Market Share by Broker (Value)')
+            story.append(Paragraph('Summary Chart: Market Share by Broker (Value)', self.heading1_style))
+            self.add_plotly_figure_to_story(fig1, story)
+        except Exception:
+            pass
+
+        # Overall Sale Status Distribution
+        try:
+            status_dist = df['Status_Clean'].value_counts(dropna=False).reset_index()
+            status_dist.columns = ['Status', 'Count']
+            fig2 = px.pie(status_dist, names='Status', values='Count', title='Overall Sale Status Distribution')
+            story.append(Paragraph('Summary Chart: Overall Sale Status Distribution', self.heading1_style))
+            self.add_plotly_figure_to_story(fig2, story)
+        except Exception:
+            pass
+
+        # Broker Performance - Sold Percentage (Sold+Outsold)
+        try:
+            def broker_sold_pct(x):
+                total = x['Total Weight'].sum()
+                sold_side = x[x['Status_Clean'].isin(['sold', 'outsold'])]['Total Weight'].sum()
+                return (sold_side / total * 100) if total > 0 else 0
+
+            broker_perf = df.groupby('Broker').apply(broker_sold_pct).reset_index()
+            broker_perf.columns = ['Broker', 'Sold_Pct']
+            fig3 = px.bar(broker_perf, x='Broker', y='Sold_Pct', title='Broker Performance - Sold % (Sold+Outsold)', labels={'Sold_Pct':'Sold %'})
+            fig3.update_layout(yaxis_ticksuffix='%')
+            story.append(Paragraph('Summary Chart: Broker Performance - Sold Percentage', self.heading1_style))
+            self.add_plotly_figure_to_story(fig3, story)
+        except Exception:
+            pass
+
+        # Elevation Performance - Status Percentages (Stacked Bar)
+        try:
+            elev_status = df.groupby(['Sub Elevation', 'Status_Clean'])['Total Weight'].sum().unstack(fill_value=0)
+            elev_status_pct = elev_status.div(elev_status.sum(axis=1), axis=0) * 100
+            elev_status_pct = elev_status_pct.reset_index()
+            melt = elev_status_pct.melt(id_vars='Sub Elevation', var_name='Status', value_name='Pct')
+            fig4 = px.bar(melt, x='Sub Elevation', y='Pct', color='Status', title='Elevation Performance - Status Percentages')
+            fig4.update_layout(barmode='stack', yaxis_ticksuffix='%')
+            story.append(Paragraph('Summary Chart: Elevation Performance - Status Percentages', self.heading1_style))
+            self.add_plotly_figure_to_story(fig4, story)
+        except Exception:
+            pass
     
     def generate_report(self, include_reports=None):
         """Generate optimized multi-report PDF"""
@@ -324,7 +415,13 @@ class ElevationWiseReportOptimizer:
         story.append(Paragraph("Elevation-Wise Performance Analysis (All Grades Included)", self.body_style))
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph(f"Generated: {datetime.now().strftime('%B %d, %Y at %H:%M')}", self.body_style))
-        story.append(PageBreak())
+        # Insert optional summary charts after the title page
+        try:
+            self.generate_summary_charts(story)
+            story.append(PageBreak())
+        except Exception:
+            # continue if charts generation fails
+            story.append(PageBreak())
         
         # Generate selected reports
         if include_reports.get('report1'):
